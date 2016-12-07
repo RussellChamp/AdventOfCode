@@ -20,21 +20,6 @@ fn step(state: &(i32, i32), pos: &(i32, i32), dist: i32) -> (i32, i32) {
     (pos.0 + state.0 * dist, pos.1 + state.1 * dist)
 }
 
-// fn state_to_direction(state: &(i32, i32)) -> String {
-//     match state.0 {
-//         1 => "N",
-//         -1 => "S",
-//         0 => {
-//             match state.1 {
-//                 1 => "E",
-//                 -1 => "W",
-//                 _ => "Invalid",
-//             }
-//         },
-//         _ => "Invalid",
-//     }
-// }
-
 fn part_1(input: &String) {
     let mut state = (1, 0);
     let mut pos = (0, 0);
@@ -62,14 +47,14 @@ fn part_2(input: &String) {
 
         state = turn(&state, &dir);
         let pos = step(&state, positions.last().unwrap(), dist);
-        print!("Move {} {} to ({}, {}) - ", dist, dir, pos.0, pos.1);
+        print!("{}: {}{} -> ({}, {}), ", positions.len(), dist, dir, pos.0, pos.1);
         match positions.iter().position(|&p| p == pos) {
             Some(v) => {
                 println!("Part 2: Stopped twice at ({}, {}) on element {}, {} away from the start", pos.0, pos.1, v, pos.0.abs() + pos.1.abs());
                 break;
             },
             None => {
-                println!("Did not match {} locations", positions.len());
+                //println!("Did not match {} locations", positions.len());
                 positions.push(pos);
             },
         }

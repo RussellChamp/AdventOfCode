@@ -3,7 +3,7 @@ extern crate regex;
 use std::io::Read;
 use std::fs::File;
 use regex::Regex;
-use std::collections::HashMap;
+//use std::collections::HashMap;
 
 ///// THIS IS NOT WORKING RIGHT. :(
 
@@ -27,18 +27,57 @@ struct Room {
 fn part_1(input: &String) {
     let re = Regex::new(r"([a-z\\-]+)-([:digit:]+)\[([:lower:]+)\]").unwrap();
 
-    let sum = 0;
-    for cap in re.captures_iter(input) {
+    let mut sum = 0;
+    'outer: for cap in re.captures_iter(input) {
         let room = Room {   name: String::from(cap.at(1).unwrap_or("")),
                             sector: cap.at(2).unwrap_or("0").parse().unwrap_or(0),
                             check: String::from(cap.at(3).unwrap_or("")),
                         };
-        let mut charMap: HashMap<char, i32> = HashMap::new();
-        for ch in room.name.replace("-", "").chars() {
-            let l = charMap.entry(ch).or_insert(0);
-            *l += 1;
+        //println!("{:?}", room);
+        let mut accumulator = [0; 26];
+        for letter in room.name.replace("-", "").chars() {
+            let letter_idx = letter as u8 - 'a' as u8;
+            accumulator[letter_idx as usize] = accumulator[letter_idx as usize] + 1;
+            //println!("The letter is {} with a value {} - {:?}", letter, letter_idx, accumulator);
         }
-        println!("{:?}", charMap);
+
+        //println!("Accumulated {:?}", accumulator);
+
+        let mut letters_to_match = room.check.len();
+        let mut biggest_value = -1;
+        let mut biggest_idxs: Vec<u8> = Vec::new();
+        while letters_to_match > 0 {
+            for idx in 0..accumulator.len() {
+                if accumulator[idx] > biggest_value {
+                    biggest_value = accumulator[idx];
+                    biggest_idxs = vec![idx as u8];
+                } else if accumulator[idx] == biggest_value {
+                    biggest_idxs.push(idx as u8); //add it with the others
+                }
+            }
+            biggest_idxs.reverse(); //we want to take items off in the order we put them on
+            //println!("These letters had a score of {}: {:?}", biggest_value, biggest_idxs);
+            while letters_to_match > 0 && biggest_idxs.len() > 0 {
+                let letter_idx = biggest_idxs.pop().unwrap();
+                let letter_value = (letter_idx + 'a' as u8) as char;
+                if ! room.check.as_str().contains(letter_value) {
+                    continue 'outer;
+                }
+                accumulator[letter_idx as usize] = 0; //nope this broke things
+                biggest_value = -1;
+                letters_to_match = letters_to_match - 1;
+            }
+        }
+        //phew! we successfully checked this room. the sector is old, but it checks out
+        println!("Valid! {:?}", room);
+        sum = sum + room.sector;
+
+        // let mut char_map: HashMap<char, i32> = HashMap::new();
+        // for ch in room.name.replace("-", "").chars() {
+        //     let l = char_map.entry(ch).or_insert(0);
+        //     *l += 1;
+        // }
+        // println!("{:?}", char_map);
         //println!("{:?}", room);
         //let mut letters: Vec<char> = .collect();
         //println!("{:?}", letters.sort());
