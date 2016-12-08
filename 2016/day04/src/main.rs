@@ -3,6 +3,7 @@ extern crate regex;
 use std::io::Read;
 use std::fs::File;
 use regex::Regex;
+use regex::RegexSet;
 //use std::collections::HashMap;
 
 ///// THIS IS NOT WORKING RIGHT. :(
@@ -24,7 +25,7 @@ struct Room {
     check: String,
 }
 
-fn part_1(input: &String) {
+fn part_1_2(input: &String) {
     let re = Regex::new(r"([a-z\\-]+)-([:digit:]+)\[([:lower:]+)\]").unwrap();
 
     let mut sum = 0;
@@ -69,8 +70,22 @@ fn part_1(input: &String) {
             }
         }
         //phew! we successfully checked this room. the sector is old, but it checks out
-        println!("Valid! {:?}", room);
+        //println!("Valid! {:?}", room);
         sum = sum + room.sector;
+
+        //decrypt room name
+        let real_name = room.name.chars().map(|c|
+            match c {
+                '-' => ' ',
+                _ => ((((c as i32 - 'a' as i32) + room.sector as i32) % 26) as u8 + 'a' as u8) as char,
+            })
+        .collect::<String>();
+        let set = RegexSet::new(&[r"north", r"pole", r"snow", r"santa", r"christmas"]).unwrap();
+        if set.is_match(&real_name) {
+            println!("Part 2: {} ({})", real_name, room.sector);
+        }
+        //println!("{} ({})", real_name, room.sector);
+
 
         // let mut char_map: HashMap<char, i32> = HashMap::new();
         // for ch in room.name.replace("-", "").chars() {
@@ -109,5 +124,5 @@ fn main() {
     let mut input = String::new();
     file.read_to_string(&mut input).expect("could not read file");
 
-    part_1(&input);
+    part_1_2(&input);
 }
