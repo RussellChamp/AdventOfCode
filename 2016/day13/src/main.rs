@@ -128,7 +128,7 @@ fn main() {
     //print_maze(32, 40, 1358);
     build_maze(&mut maze, 1358);
     walk_maze(&mut maze, (1, 1), 0);
-    //print_maze(&maze);
+    print_maze(&maze);
     let end = (31, 39);
     println!("Part 1: It takes {} steps to get to ({}, {})", maze[end.1][end.0].1, end.0, end.1);
     unsafe {
