@@ -14,8 +14,8 @@ enum Pass {
 struct Bot {
     id: i32, //the identifier for this bot
     chips: Vec<i32>, //the value of the chips a bot can receive
-    low: i32, //where to pass the low chip
-    high: i32, //where to pass the high chip
+    low: Option<i32>, //where to pass the low chip
+    high: Option<i32>, //where to pass the high chip
 }
 
 struct Output {
@@ -23,12 +23,12 @@ struct Output {
     chips: Vec<i32>,
 }
 
-fn pass_chip(all_bots: Vec<Bot>, bot_id: i32, value: i32) {
-    let bot: Bot = all_bots.iter().find(|&b| b.id == bot_id).unwrap();
+fn pass_chip(all_bots: &Vec<Bot>, bot_id: i32, value: i32) {
+    let mut bot = all_bots.iter().find(|&b| b.id == bot_id).unwrap();
     bot.chips.push(value);
     if bot.chips.len() == 2 {
-        pass_chip(all_bots, bot.low, bot.chips.iter().min().unwrap());
-        pass_chip(all_bots, bot.high, bot.chips.iter().max().unwrap());
+        pass_chip(all_bots, bot.low.unwrap(), *bot.chips.iter().clone().min().unwrap());
+        pass_chip(all_bots, bot.high.unwrap(), *bot.chips.iter().clone().max().unwrap());
     }
 }
 
