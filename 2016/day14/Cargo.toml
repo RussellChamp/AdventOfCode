@@ -1,0 +1,8 @@
+[package]
+name = "day14"
+version = "0.1.0"
+authors = ["~krowbar"]
+
+[dependencies]
+rust-crypto = "^0.2"
+regex = "0.1"
